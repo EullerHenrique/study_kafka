@@ -55,4 +55,29 @@ Kafka e seus super poderes
     - Se conecta com quase tudo
     - Bibliotecas prontas para as mais diversas tecnologias
     - Ferramentas open-source
-    
+
+Conceitos e dinâmica de funcionamento
+
+Producer -> Kafka -> Broker A, Broker B, Broker C <- consumer
+
+Tópicos
+
+Tópico é o canal de comunicação responsável por receber e disponibilizar os dados enviados para o Kafka
+
+Producer -> Tópico -> Kafka -> Tópico -> Consumer
+
+Partição do Tópico Vendas
+
+                Producer
+
+ |   |   |   |   |   |   |   |   |   |   |
+ V   v   v   v   v   v   v   v   v   v   v
+
+[0] [1] [2] [3] [4] [5] [6] [7] [8] [9] [N] - offsets
+ 
+ |   |   |   |   |   |   |   |   |   |   |
+ v   v   v   v   v   v   v   v   v   v   v
+            App             App     
+             A               B
+            
+                Consumer
