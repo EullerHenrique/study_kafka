@@ -81,3 +81,81 @@ Partição do Tópico Vendas
              A               B
             
                 Consumer
+        
+Anatomia de um registro
+
+    Offset 0
+
+---------------
+    headers
+--------------
+     key
+--------------
+     value
+--------------
+   timestamp
+--------------
+
+
+Partições
+
+Cada tópico pode ter uma ou mais partições para conseguir garantir a distribuição e resiliência de seus dados
+
+Tópico -> Partição 1    
+       -> Partição 2
+       -> Partição 3
+
+Sobre as Keys
+
+Se a transferência e o estorno estiverem em partições diferentes e os sistemas que os consomem não possuirem a mesma velocidade, 
+o estorno pode ser solicitado antes que a transferência seja registrada
+Para isso não ocorrer, a transferência e o estorno devem estar em uma mesma partição
+Para isso ocorrer, os dois devem possuir a mesma chave
+
+Transferência (0) -> key=Movimentação
+Estorno (1) -> key=Movimentação
+
+a, b ->Partição 1 -> [0][1] <---- Consumer 1 (lento) 
+
+c -> Partição 2 -> [0] <---- Consumer 2 (rápido)
+
+d -> Partição 3 -> [0] <---- Consumer 3
+
+Partições distribuídas
+
+Tópico: Vendas -> Broker A (Máquina A) [Partição 1]
+               -> Broker B (Máquina B) [Partição 2]
+               -> Broker C (Máquina C) [Partição 3]
+
+
+Replication Factor = 2 (Garante que a aplicação nunca ficará fora do ar, pois se um broker cair, as partições dele continuarão no ar em outros brokers)
+|
+v
+Tópico: Vendas -> Broker A [Partição 1, Partição 3]
+               -> Broker B [Partição 2, Partição 1]
+               -> Broker C [Partição 3, Partição 2]
+
+Consumer
+
+                Tópico    
+            - Partição 0 - ->
+Producer -> - Partição 1 - ->  Consumer
+            - Partição 2 - ->
+
+Consumer Groups
+
+               Tópico               Grupo X
+            - Partição 0 - ->   - Consumer A -
+Producer -> - Partição 1 - ->   - Consumer A -
+            - Partição 2 - ->   - Consumer B -
+
+               Tópico               Grupo X
+            - Partição 0 - ->   - Consumer A -
+Producer -> - Partição 1 - ->   - Consumer B -
+            - Partição 2 - ->   - Consumer C -
+
+               Tópico               Grupo X
+            - Partição 0 - ->   - Consumer A -
+Producer -> - Partição 1 - ->   - Consumer B -
+            - Partição 2 - ->   - Consumer C -
+                                - Consumer D - 
